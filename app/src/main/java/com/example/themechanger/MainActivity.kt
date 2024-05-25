@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -67,7 +68,7 @@ class MainActivity : ComponentActivity() {
 fun Layout() {
     var color by remember { mutableStateOf("") }
     var validColor by remember { mutableStateOf(true) }
-    var prevColor = Color.White
+    var prevColor = Color.Red
     var isRed by remember { mutableStateOf(true) }
     var backgroundColor = if (validColor) {
         parseColor(color) ?: prevColor
@@ -81,8 +82,8 @@ fun Layout() {
     )
 
     val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
-        disabledTextColor = Color.White,
-        disabledBorderColor = if (!validColor) Color.Red else Color.Gray,
+        disabledTextColor = Color.Black,
+        disabledBorderColor = if (!validColor) Color.Red else Color.Black,
         containerColor = Color.White,
     )
 
@@ -117,14 +118,21 @@ fun Layout() {
                 )
             )
         }
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.Bottom
+    ){
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.8f)
                 .background(
                     color = Color.White,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(30.dp, 30.dp)
                 )
-                .height((120.dp)),
+                .height((130.dp))
+                .fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ){
             OutlinedTextField(
@@ -137,15 +145,17 @@ fun Layout() {
                         )
                     )
                 },
-                onValueChange = {
-                    color = it
-                    validColor = ValidHEX(color) || parseColor(color) != null
+                onValueChange = { newValue ->
+                    if (!newValue.contains(" ")) { // Sprawdź, czy nowa wartość nie zawiera spacji
+                        color = newValue
+                        validColor = ValidHEX(color) || parseColor(color) != null
+                    }
                 },
                 supportingText = {
                     if (!validColor) {
                         Text(
                             text = "Insert valid HEX color value or color name. Available colors: black, blue, cyan, gray, green, magenta, red, white, yellow.",
-                            modifier = Modifier.height(36.dp),
+                            modifier = Modifier.height(40.dp),
                             fontSize = 12.sp,
                             style = TextStyle(
                                 fontFamily = fonts,
@@ -161,14 +171,13 @@ fun Layout() {
                     imeAction = ImeAction.Done
                 ),
                 colors = textFieldColors
-                )
+            )
         }
-        Box(){}
     }
 }
 
 fun ValidHEX(x: String): Boolean {
-    val regexPattern = """^#[0-9A-Fa-f]{6}[0-9A-Fa-f]{0,2}${'$'}""".toRegex()
+    val regexPattern = """^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?${'$'}""".toRegex()
     return regexPattern.matches(x)
 }
 
